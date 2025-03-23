@@ -41,4 +41,10 @@ public class OrderController {
             .doOnSuccess(result -> log.info("Result received: {}", result));
     }
 
+    @GetMapping(value = "/parallelBlock")
+    public CombinedResult waitAllBlock() {
+        log.info("getParallelOrders start");
+        return parallelService.waitAllBlock();
+    }
+
 }

@@ -20,6 +20,22 @@ public class ParallelService {
     private final BService bService;
     private final CService cService;
 
+    public CombinedResult waitAllBlock() {
+
+        return Mono.zip(
+                aService.getAResponse().switchIfEmpty(Mono.error(new RuntimeException("A service returned empty"))).doOnError(e -> log.error("aResponse error: , e")),
+                bService.getBResponse().switchIfEmpty(Mono.error(new RuntimeException("B service returned empty"))).doOnError(e -> log.error("bResponse error: , e")),
+                cService.getCResponse().switchIfEmpty(Mono.error(new RuntimeException("C service returned empty"))).doOnError(e -> log.error("cResponse error: , e")))
+            .doOnNext(response -> log.info("response: {}", response))
+//                .publishOn(Schedulers.boundedElastic())
+            .map(tuple -> {
+                    AResponse t1 = tuple.getT1();
+                    BResponse t2 = tuple.getT2();
+                    CResponse t3 = tuple.getT3();
+                    return new CombinedResult(t1, t2, t3);
+                }
+            ).doOnError(e -> log.error("error: , e")).block();
+    }
 
     public Mono<CombinedResult> waitAll() {
 
