@@ -1,0 +1,12 @@
+server:
+  port: 9900
+  tomcat:
+    threads:
+      max: 1
+      min-spare: 1
+spring:
+  application:
+    name: api
+logging:
+  level:
+    root: info
